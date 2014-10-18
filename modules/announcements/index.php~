@@ -355,7 +355,7 @@ if ($is_editor) {
 	curl_setopt($ch,CURLOPT_URL, $url);
 	curl_setopt($ch,CURLOPT_POST, count($fields));//kanei post mono otan count($fields)==TRUE pou einai mias kai count($fileds)>=1 otan grafoume kati sto keimeno tis anakoinwsis
 	curl_setopt($ch,CURLOPT_POSTFIELDS, $fields_string);
-	curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);//min typwsiseis stin othoni alla vale ta apotelesmata stin $result parakatw
+	curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
 	//execute post
 	$result = curl_exec($ch);
 	//close connection
