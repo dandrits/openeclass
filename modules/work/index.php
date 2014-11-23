@@ -1393,10 +1393,13 @@ function show_submission_form($id, $user_group_info, $on_behalf_of = false) {
 			/*Choice between file upload and syntac code*/
 			    	if($_POST['epilogi']=='syntax')
 					$tool_content .= "<label for='userfile' class='col-sm-2 control-label'>$langWorkSyntax:</label>
-				<div class='col-sm-10'>".rich_text_editor('newContent', 4, 20, $contentToModify)."</div>";
+				<div class='col-sm-10'>".rich_text_editor('newContent', 4, 20, $Syntax)."</div>";
 				elseif($_POST['epilogi']=='upload')
-					$tool_content .= "<label for='userfile' class='col-sm-2 control-label'>$langWorkFile:</label>        	
-		                <input type='file'  name='userfile' id='userfile'>";
+					$tool_content .= "
+					<label for='userfile' class='col-sm-2 control-label'>$langWorkFile:</label>        
+		                	<input type='file'  name='userfile' id='userfile'>";
+				else
+					Session::Messages($m['NoneWorkMethod'], 'alert-danger');
 			$tool_content .="
                         </div>
                         <div class='form-group'>

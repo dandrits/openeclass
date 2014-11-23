@@ -3503,6 +3503,7 @@ $m['NoneWorkGroupNoSubmission'] = 'Δεν υπάρχουν ομάδες χρησ
 $m['WorkUserNoSubmission'] = 'Χρήστες που δεν έχουν υποβάλει εργασία';
 $m['NoneWorkUserNoSubmission'] = 'Δεν υπάρχουν χρήστες που δεν έχουν υποβάλει εργασία';
 $m['WorkTitleValidation'] = 'Παρακαλώ εισάγετε Τίτλο Εργασίας';
+$m['NoneWorkMethod']='Παρακαλώ επιλέξτε μέθοδο υποβολής εργασίας!';
 $m['SubmissionWorkInfo'] = 'Στοιχεία υποβολής εργασίας';
 $m['SubmissionStatusWorkInfo'] = 'Κατάσταση υποβολής εργασίας';
 $m['subm'] = 'Υποβλ.';
