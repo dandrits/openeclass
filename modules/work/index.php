@@ -1390,6 +1390,7 @@ function show_submission_form($id, $user_group_info, $on_behalf_of = false) {
 				</form>
 			</div>
 			<div class='form-group'>";
+			/*Choice between file upload and syntac code*/
 			    	if($_POST['epilogi']=='syntax')
 					$tool_content .= "<label for='userfile' class='col-sm-2 control-label'>$langWorkSyntax:</label>
 				<div class='col-sm-10'>".rich_text_editor('newContent', 4, 20, $contentToModify)."</div>";
