@@ -409,7 +409,7 @@ function submit_work($id, $on_behalf_of = null) {
     global $tool_content, $workPath, $uid, $course_id, $works_url,
     $langUploadSuccess, $langBack, $langUploadError,
     $langExerciseNotPermit, $langUnwantedFiletype, $course_code,
-    $langOnBehalfOfUserComment, $langOnBehalfOfGroupComment, $course_id;
+    $langOnBehalfOfUserComment, $langOnBehalfOfGroupComment, $course_id, $Syntax;
     $langExt = array(
         'C' => 'c',
         'CPP' => 'cpp',
@@ -532,7 +532,8 @@ function submit_work($id, $on_behalf_of = null) {
                 $grade_comments = $grade_ip = "";            
             }
             if (!$group_sub or array_key_exists($group_id, $gids)) {
-                $file_name = $_FILES['userfile']['name'];
+/*εδώ πρέπει να μπει ο κώδικας για την αποθήκευση*/
+		$file_name = $_FILES['userfile']['name'];
                 $sid = Database::get()->query("INSERT INTO assignment_submit
                                         (uid, assignment_id, submission_date, submission_ip, file_path,
                                          file_name, comments, grade, grade_comments, grade_submission_ip,
@@ -1299,7 +1300,7 @@ function show_student_assignment($id) {
 
 function show_submission_form($id, $user_group_info, $on_behalf_of = false) {
     global $tool_content, $m, $langWorkFile, $langSendFile, $langSubmit, $uid, $langNotice3, $gid, $is_member,
-    $urlAppend, $langGroupSpaceLink, $langOnBehalfOf, $course_code, $langWorkSyntax, $langWork;
+    $urlAppend, $langGroupSpaceLink, $langOnBehalfOf, $course_code, $langWorkSyntax, $langWork, $Syntax;
 
     $group_select_hidden_input = $group_select_form = '';
     $is_group_assignment = is_group_assignment($id);

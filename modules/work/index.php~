@@ -409,7 +409,7 @@ function submit_work($id, $on_behalf_of = null) {
     global $tool_content, $workPath, $uid, $course_id, $works_url,
     $langUploadSuccess, $langBack, $langUploadError,
     $langExerciseNotPermit, $langUnwantedFiletype, $course_code,
-    $langOnBehalfOfUserComment, $langOnBehalfOfGroupComment, $course_id;
+    $langOnBehalfOfUserComment, $langOnBehalfOfGroupComment, $course_id, $Syntax;
     $langExt = array(
         'C' => 'c',
         'CPP' => 'cpp',
@@ -532,7 +532,11 @@ function submit_work($id, $on_behalf_of = null) {
                 $grade_comments = $grade_ip = "";            
             }
             if (!$group_sub or array_key_exists($group_id, $gids)) {
-                $file_name = $_FILES['userfile']['name'];
+		/*if(isset($Syntax)&&$Syntax!=''){
+			$_FILES['userfile']=$Syntax;
+			$_FILES['userfile']['name']=$lang;
+		else*/
+			$file_name = $_FILES['userfile']['name'];
                 $sid = Database::get()->query("INSERT INTO assignment_submit
                                         (uid, assignment_id, submission_date, submission_ip, file_path,
                                          file_name, comments, grade, grade_comments, grade_submission_ip,
@@ -1299,7 +1303,7 @@ function show_student_assignment($id) {
 
 function show_submission_form($id, $user_group_info, $on_behalf_of = false) {
     global $tool_content, $m, $langWorkFile, $langSendFile, $langSubmit, $uid, $langNotice3, $gid, $is_member,
-    $urlAppend, $langGroupSpaceLink, $langOnBehalfOf, $course_code, $langWorkSyntax, $langWork;
+    $urlAppend, $langGroupSpaceLink, $langOnBehalfOf, $course_code, $langWorkSyntax, $langWork, $Syntax;
 
     $group_select_hidden_input = $group_select_form = '';
     $is_group_assignment = is_group_assignment($id);
@@ -1395,8 +1399,11 @@ function show_submission_form($id, $user_group_info, $on_behalf_of = false) {
 					$tool_content .= "<label for='userfile' class='col-sm-2 control-label'>$langWorkSyntax:</label>
 				<div class='col-sm-10'>".rich_text_editor('newContent', 4, 20, $Syntax)."</div>";
 				elseif($_POST['epilogi']=='upload')
-					$tool_content .= "<label for='userfile' class='col-sm-2 control-label'>$langWorkFile:</label>        	
-		                <input type='file'  name='userfile' id='userfile'>";
+					$tool_content .= "
+					<label for='userfile' class='col-sm-2 control-label'>$langWorkFile:</label>        
+		                	<input type='file'  name='userfile' id='userfile'>";
+				else
+					Session::Messages($m['NoneWorkMethod'], 'alert-danger');
 			$tool_content .="
                         </div>
                         <div class='form-group'>
