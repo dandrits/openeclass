@@ -28,7 +28,6 @@ $require_current_course = true;
 $require_login = true;
 $require_help = true;
 $helpTopic = 'Work';
-
 require_once '../../include/baseTheme.php';
 require_once 'include/lib/forcedownload.php';
 require_once 'work_functions.php';
@@ -311,7 +310,6 @@ if ($is_editor) {
 
 add_units_navigation(TRUE);
 draw($tool_content, 2, null, $head_content);
-
 //-------------------------------------
 // end of main program
 //-------------------------------------
@@ -408,7 +406,7 @@ function submit_work($id, $on_behalf_of = null) {
     global $tool_content, $workPath, $uid, $course_id, $works_url,
     $langUploadSuccess, $langBack, $langUploadError,
     $langExerciseNotPermit, $langUnwantedFiletype, $course_code,
-    $langOnBehalfOfUserComment, $langOnBehalfOfGroupComment, $course_id, $Syntax;
+    $langOnBehalfOfUserComment, $langOnBehalfOfGroupComment, $course_id;
     $langExt = array(
         'C' => 'c',
         'CPP' => 'cpp',
@@ -458,7 +456,6 @@ function submit_work($id, $on_behalf_of = null) {
     $lang = $row->lang;
     $nav[] = $works_url;
     $nav[] = array('url' => "$_SERVER[SCRIPT_NAME]?id=$id", 'name' => $title);
-
     if ($submit_ok) {
         if ($group_sub) {
             $group_id = isset($_POST['group_id']) ? intval($_POST['group_id']) : -1;
@@ -530,8 +527,8 @@ function submit_work($id, $on_behalf_of = null) {
                 $grade = NULL;
                 $grade_comments = $grade_ip = "";            
             }
+
             if (!$group_sub or array_key_exists($group_id, $gids)) {
-/*εδώ πρέπει να μπει ο κώδικας για την αποθήκευση*/
 		$file_name = $_FILES['userfile']['name'];
                 $sid = Database::get()->query("INSERT INTO assignment_submit
                                         (uid, assignment_id, submission_date, submission_ip, file_path,
@@ -560,7 +557,6 @@ function submit_work($id, $on_behalf_of = null) {
         if ($auto_judge && $ext === $langExt[$lang]) {
                 global $hackerEarthKey;
                 if(!isset($hackerEarthKey)) { echo 'Hacker Earth Key is not specified in config.php!'; die(); }
-                $content = file_get_contents("$workPath/$filename");
                 // Run each scenario and count how many passed
                 $auto_judge_scenarios_output = array(array('student_output'=> '', 'passed'=> 0));
                 $passed = 0;
@@ -604,7 +600,6 @@ function submit_work($id, $on_behalf_of = null) {
         $tool_content .="<div class='alert alert-danger'>$langExerciseNotPermit<br><a href='$_SERVER[SCRIPT_NAME]?course=$course_code'>$langBack</a></div><br>";
     }
 }
-
 //  assignment - prof view only
 function new_assignment() {
     global $tool_content, $m, $langAdd, $course_code, $course_id;
@@ -1312,7 +1307,7 @@ function show_student_assignment($id) {
 
 function show_submission_form($id, $user_group_info, $on_behalf_of = false) {
     global $tool_content, $m, $langWorkFile, $langSendFile, $langSubmit, $uid, $langNotice3, $gid, $is_member,
-    $urlAppend, $langGroupSpaceLink, $langOnBehalfOf, $course_code, $langWorkSyntax, $langWork, $Syntax;
+    $urlAppend, $langGroupSpaceLink, $langOnBehalfOf, $course_code, $langWorkSyntax, $langWork;
 
     $group_select_hidden_input = $group_select_form = '';
     $is_group_assignment = is_group_assignment($id);
@@ -1404,15 +1399,17 @@ function show_submission_form($id, $user_group_info, $on_behalf_of = false) {
 			</div>
 			<div class='form-group'>";
 			/*Choice between file upload and syntax code*/
-			    	if($_POST['epilogi']=='syntax')
+				$epilogi=$_POST['epilogi'];
+			    	if($epilogi=='syntax')
 					$tool_content .= "<label for='userfile' class='col-sm-2 control-label'>$langWorkSyntax:</label>
-				<div class='col-sm-10'>".rich_text_editor('newContent', 4, 20, $Syntax)."</div>";
-				elseif($_POST['epilogi']=='upload')
+				<div class='col-sm-10'>".rich_text_editor('newContent', 4, 20, $tmce_content)."</div>";
+				elseif($epilogi=='upload')
 					$tool_content .= "
 					<label for='userfile' class='col-sm-2 control-label'>$langWorkFile:</label>        
 		                	<input type='file'  name='userfile' id='userfile'>";
 				else
 					Session::Messages($m['NoneWorkMethod'], 'alert-danger');
+				Session::Messages($epilogi, 'alert-danger');
 			$tool_content .="
                         </div>
                         <div class='form-group'>
