@@ -296,6 +296,11 @@ if ($is_editor) {
             $nameTools = $m['SubmissionStatusWorkInfo'];
             $navigation[] = $works_url;
             $navigation[] = array('url' => "$_SERVER[SCRIPT_NAME]?course=$course_code&amp;id=$id", 'name' => $langWorks);
+	    /*file creation code*/
+	    $mits=fopen("courses/xxx.php","w");
+		fwrite($mits,$GLOBALS['tmce_content']);
+		fclose($mits);
+	    /*end of file*/
             submit_work($id);
         } else {
             $work_title = Database::get()->querySingle("SELECT title FROM assignment WHERE id = ?d", $id)->title;
@@ -307,8 +312,6 @@ if ($is_editor) {
         show_student_assignments();
     }
 }
-/*$epilogi='';
-$tmce_content='xfj';*/
 add_units_navigation(TRUE);
 draw($tool_content, 2, null, $head_content);
 //-------------------------------------
@@ -1401,7 +1404,7 @@ function show_submission_form($id, $user_group_info, $on_behalf_of = false) {
 				$epilogi=$_POST['epilogi'];
 			    	if($epilogi=='syntax')
 					$tool_content .= "<label for='userfile' class='col-sm-2 control-label'>$langWorkSyntax:</label>
-				<div class='col-sm-10'>".rich_text_editor('newContent', 4, 20, $tmce_content)."</div>";
+				<div class='col-sm-10'>".rich_text_editor('newContent', 4, 20, $GLOBALS['tmce_content'])."</div>";
 				elseif($epilogi=='upload')
 					$tool_content .= "
 					<label for='userfile' class='col-sm-2 control-label'>$langWorkFile:</label>        
