@@ -307,7 +307,8 @@ if ($is_editor) {
         show_student_assignments();
     }
 }
-
+/*$epilogi='';
+$tmce_content='xfj';*/
 add_units_navigation(TRUE);
 draw($tool_content, 2, null, $head_content);
 //-------------------------------------
@@ -406,7 +407,7 @@ function submit_work($id, $on_behalf_of = null) {
     global $tool_content, $workPath, $uid, $course_id, $works_url,
     $langUploadSuccess, $langBack, $langUploadError,
     $langExerciseNotPermit, $langUnwantedFiletype, $course_code,
-    $langOnBehalfOfUserComment, $langOnBehalfOfGroupComment, $course_id;
+    $langOnBehalfOfUserComment, $langOnBehalfOfGroupComment, $course_id,$epilogi,$tmce_content;
     $langExt = array(
         'C' => 'c',
         'CPP' => 'cpp',
@@ -421,7 +422,6 @@ function submit_work($id, $on_behalf_of = null) {
         'PYTHON' => 'py',
         'RUBY' => 'ruby',
     );
-
     if (isset($on_behalf_of)) {
         $user_id = $on_behalf_of;
     } else {
@@ -593,7 +593,6 @@ function submit_work($id, $on_behalf_of = null) {
                 $grade = round($passed/count($auto_judge_scenarios)*10);
                 // Add the output as a comment
                 submit_grade_comments($id, $sid, $grade, 'Passed: '.$passed.'/'.count($auto_judge_scenarios), false, $auto_judge_scenarios_output, true);
-          
         }
         // End Auto-judge
     } else { // not submit_ok
@@ -1307,7 +1306,7 @@ function show_student_assignment($id) {
 
 function show_submission_form($id, $user_group_info, $on_behalf_of = false) {
     global $tool_content, $m, $langWorkFile, $langSendFile, $langSubmit, $uid, $langNotice3, $gid, $is_member,
-    $urlAppend, $langGroupSpaceLink, $langOnBehalfOf, $course_code, $langWorkSyntax, $langWork;
+    $urlAppend, $langGroupSpaceLink, $langOnBehalfOf, $course_code, $langWorkSyntax, $langWork,$epilogi,$tmce_content;
 
     $group_select_hidden_input = $group_select_form = '';
     $is_group_assignment = is_group_assignment($id);
@@ -1409,7 +1408,6 @@ function show_submission_form($id, $user_group_info, $on_behalf_of = false) {
 		                	<input type='file'  name='userfile' id='userfile'>";
 				else
 					Session::Messages($m['NoneWorkMethod'], 'alert-danger');
-				Session::Messages($epilogi, 'alert-danger');
 			$tool_content .="
                         </div>
                         <div class='form-group'>
