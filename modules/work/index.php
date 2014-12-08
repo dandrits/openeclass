@@ -296,10 +296,16 @@ if ($is_editor) {
             $nameTools = $m['SubmissionStatusWorkInfo'];
             $navigation[] = $works_url;
             $navigation[] = array('url' => "$_SERVER[SCRIPT_NAME]?course=$course_code&amp;id=$id", 'name' => $langWorks);
+	    /*file path*/
+	    
+	    /*end of file path*/
 	    /*file creation code*/
-	    $mits=fopen("courses/xxx.php","w");
-		fwrite($mits,$GLOBALS['tmce_content']);
-		fclose($mits);
+	    if(isset($_POST['tmce_content']))
+	    {
+	    	$f=fopen("courses/xxx.php","w");
+	    	fwrite($f,$_POST['tmce_content']);
+	    	fclose($f);
+	     }
 	    /*end of file*/
             submit_work($id);
         } else {
@@ -317,7 +323,6 @@ draw($tool_content, 2, null, $head_content);
 //-------------------------------------
 // end of main program
 //-------------------------------------
-
 // insert the assignment into the database
 function add_assignment() {
     global $tool_content, $workPath, $course_id, $uid, $langTheField, $m, 
@@ -1404,7 +1409,7 @@ function show_submission_form($id, $user_group_info, $on_behalf_of = false) {
 				$epilogi=$_POST['epilogi'];
 			    	if($epilogi=='syntax')
 					$tool_content .= "<label for='userfile' class='col-sm-2 control-label'>$langWorkSyntax:</label>
-				<div class='col-sm-10'>".rich_text_editor('newContent', 4, 20, $GLOBALS['tmce_content'])."</div>";
+				<div class='col-sm-10'><input type='text' name='tmce_content'/></div>";//rich_text_editor('newContent', 4, 20, $tmce_content)
 				elseif($epilogi=='upload')
 					$tool_content .= "
 					<label for='userfile' class='col-sm-2 control-label'>$langWorkFile:</label>        
