@@ -297,13 +297,17 @@ if ($is_editor) {
             $navigation[] = $works_url;
             $navigation[] = array('url' => "$_SERVER[SCRIPT_NAME]?course=$course_code&amp;id=$id", 'name' => $langWorks);
 	    /*file path*/
-	    
+	    $fpath="courses/" . $course_code . "/work";
 	    /*end of file path*/
+	    //$db = Database::get()->queryArray("SELECT cource_id,lang FROM `assignment` WHERE course_id = ?d", $course_id);
+	    /*katalixi arxeiou*/
+	    $glwssa="php";
 	    /*file creation code*/
+	    $arxeio=$fpath."/xxx.".$glwssa;
 	    if(isset($_POST['tmce_content']))
 	    {
-	    	$f=fopen("courses/xxx.php","w");
-	    	fwrite($f,$_POST['tmce_content']);
+	    	$f=fopen($arxeio,"w");
+	    	fwrite($f,$_REQUEST['id']);//$_POST['tmce_content']
 	    	fclose($f);
 	     }
 	    /*end of file*/
@@ -1406,11 +1410,10 @@ function show_submission_form($id, $user_group_info, $on_behalf_of = false) {
 			</div>
 			<div class='form-group'>";
 			/*Choice between file upload and syntax code*/
-				$epilogi=$_POST['epilogi'];
-			    	if($epilogi=='syntax')
+				if((isset($_POST['epilogi']))&&($_POST['epilogi']=='syntax'))
 					$tool_content .= "<label for='userfile' class='col-sm-2 control-label'>$langWorkSyntax:</label>
-				<div class='col-sm-10'><input type='text' name='tmce_content'/></div>";//rich_text_editor('newContent', 4, 20, $tmce_content)
-				elseif($epilogi=='upload')
+				<div class='col-sm-10'><textarea name='tmce_content' id='tmce_content' rows='5' cols='55'> </textarea></div>";//rich_text_editor('newContent', 4, 20, $tmce_content)
+				elseif((isset($_POST['epilogi']))&&($_POST['epilogi']=='upload'))
 					$tool_content .= "
 					<label for='userfile' class='col-sm-2 control-label'>$langWorkFile:</label>        
 		                	<input type='file'  name='userfile' id='userfile'>";
