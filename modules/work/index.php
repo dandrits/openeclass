@@ -312,7 +312,7 @@ draw($tool_content, 2, null, $head_content);
 //-------------------------------------
 // end of main program
 //-------------------------------------
-function save_file($db_lang,$id,$uid,$cid,$sip,$scomments,$grade,$gcomments,$gip,$grid)//$sip,$scomments,$grade,$gcomments,$gip,$grid xrisimopoiountai apo to query
+function save_file($db_lang,$id,$uid,$cid)//$sip,$scomments,$grade,$gcomments,$gip,$grid xrisimopoiountai apo to query
 {
 	if(isset($_GET['course'])) $ccode=$_GET['course'];
 	/*create file path*/
@@ -321,7 +321,7 @@ function save_file($db_lang,$id,$uid,$cid,$sip,$scomments,$grade,$gcomments,$gip
 	$fpath="courses/" . $ccode . "/work/".$sdir."/";
 	/*end of file path*/
 	/*file name*/
-	$fname = substr(uniqid('', true), -$id);//random name generator based on assignment id
+	$fname = substr(uniqid('', true), -5);//random name generator based on assignment id
 	/*end of file name*/
 	/*katalixi arxeiou*/
 	if(!empty($db_lang))
@@ -349,9 +349,30 @@ function save_file($db_lang,$id,$uid,$cid,$sip,$scomments,$grade,$gcomments,$gip
 	    	fclose($f);
 	}
 	/*end of file*/
-	if (isset($sdir)&&isset($fname)&&isset($uid)&&isset($glwssa)){
-	    		$sid = Database::get()->query("INSERT INTO assignment_submit(uid, assignment_id, submission_date, submission_ip, file_path,file_name, comments, grade, grade_comments, grade_submission_ip,grade_submission_date, group_id) VALUES (?d, ?d, NOW(), ?s, ?s, ?s, ?s, ?f, ?s, ?s, NOW(), ?d)", $uid, $id, $sip, $sdir.'/'.$fname, $fname, $scomments, $grade, $gcomments, $gip, $grid)->lastInsertID;
+	if (isset($on_behalf_of)) {
+                if ($group_sub) {
+                    $auto_comments = sprintf($langOnBehalfOfGroupComment, uid_to_name($uid), $gids[$group_id]);
+                } else {
+                    $auto_comments = sprintf($langOnBehalfOfUserComment, uid_to_name($uid), uid_to_name($user_id));
+                }
+                $stud_comments = $auto_comments;
+                $grade_comments = $_POST['stud_comments'];
+                
+                $grade_valid = filter_input(INPUT_POST, 'grade', FILTER_VALIDATE_FLOAT);
+                (isset($_POST['grade']) && $grade_valid!== false) ? $grade = $grade_valid : $grade = NULL;
+             
+                $grade_ip = $submit_ip;
+        }
+	else {
+                $stud_comments = $_POST['stud_comments'];
+                $grade = NULL;
+                $grade_comments = $grade_ip = "";            
+            }
+        if (!$group_sub or array_key_exists($group_id, $gids)) {
+		if (isset($sdir)&&isset($fname)&&isset($uid)&&isset($glwssa)){
+	    		$sid = Database::get()->query("INSERT INTO assignment_submit(uid, assignment_id, submission_date, submission_ip, file_path,file_name, comments, grade, grade_comments, grade_submission_ip,grade_submission_date, group_id) VALUES (?d, ?d, NOW(), ?s, ?s, ?s, ?s, ?f, ?s, ?s, NOW(), ?d)", $uid, $id, $_SERVER['REMOTE_ADDR'], $sdir.'/'.$fname.$glwssa, $fname, $stud_comments, $grade, $grade_comments,$grade_ip, $group_id)->lastInsertID;
 	        }
+	}
 }
 // insert the assignment into the database
 function add_assignment() {
@@ -517,7 +538,7 @@ function submit_work($id, $on_behalf_of = null) {
         } else {
             $no_files = false;
         }
-	save_file($lang,$id,$user_id,$course_id,$submit_ip,$stud_comments,$grade,$grade_comments,$grade_ip,$group_id);
+	save_file($lang,$id,$user_id,$course_id,$stud_comments,$grade,$grade_comments,$grade_ip,$group_id);
         validateUploadedFile($_FILES['userfile']['name'], 2);
 	/*edw den paizei to save_file*/
         if (preg_match('/\.(ade|adp|bas|bat|chm|cmd|com|cpl|crt|exe|hlp|hta|' . 'inf|ins|isp|jse|lnk|mdb|mde|msc|msi|msp|mst|pcd|pif|reg|scr|sct|shs|' . 'shb|url|vbe|vbs|wsc|wsf|wsh)$/', $_FILES['userfile']['name'])) {
@@ -572,7 +593,7 @@ function submit_work($id, $on_behalf_of = null) {
                                         (uid, assignment_id, submission_date, submission_ip, file_path,
                                          file_name, comments, grade, grade_comments, grade_submission_ip,
                                          grade_submission_date, group_id)
-                                         VALUES (?d, ?d, NOW(), ?s, ?s, ?s, ?s, ?f, ?s, ?s, NOW(), ?d)", $user_id, $id, $submit_ip, $filename, $file_name, $stud_comments, $grade, $grade_comments, $grade_ip, $group_id)->lastInsertID;
+                                         VALUES (?d, ?d, NOW(), ?s, ?s, ?s, ?s, ?f, ?s, ?s, NOW(), ?d)", $user_id, $id, $submit_ip, $filename, $file_name, $stud_comments, $grade, $grade_comments, $grade_ip, $group_id)->lastInsertID;//$stud_comments,$grade,$grade_comments,$grade_ip,$group_id
                 Log::record($course_id, MODULE_ID_ASSIGN, LOG_INSERT, array('id' => $sid,
                     'title' => $title,
                     'assignment_id' => $id,
