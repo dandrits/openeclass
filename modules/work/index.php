@@ -312,26 +312,31 @@ draw($tool_content, 2, null, $head_content);
 //-------------------------------------
 // end of main program
 //-------------------------------------
-function save_file(){
+function save_file($db_lang){
 	if(isset($_GET['course'])) $ccode=$_GET['course'];
 	/*create file path*/
 	$fpath="courses/" . $ccode . "/work/";
 	/*end of file path*/
-	/*katalixi arxeiou*/
-	$db_lang='PERL';
+	/*file name*/
 	$db1='xxx';
-	if($db_lang=='C') $glwssa='.c';
-	if($db_lang=='CPP') $glwssa='.cpp';
-	if($db_lang=='CPP11') $glwssa='.c11';
-	if($db_lang=='CLOJURE') $glwssa='.clj';
-	if($db_lang=='CSHARP') $glwssa='.cs';
-	if($db_lang=='JAVA') $glwssa='.java';
-	if($db_lang=='JAVASCRIPT') $glwssa='.js';
-	if($db_lang=='HASKELL') $glwssa='.hs';
-	if($db_lang=='PERL') $glwssa='.pl';
-	if($db_lang=='PHP') $glwssa='.php';
-	if($db_lang=='PYTHON') $glwssa='.py';
-	if($db_lang=='RUBY') $glwssa='.rb';
+	/*end of file name*/
+	/*katalixi arxeiou*/
+	if(!empty($db_lang))
+	{
+		if($db_lang=='C') $glwssa='.c';
+		if($db_lang=='CPP') $glwssa='.cpp';
+		if($db_lang=='CPP11') $glwssa='.c11';
+		if($db_lang=='CLOJURE') $glwssa='.clj';
+		if($db_lang=='CSHARP') $glwssa='.cs';
+		if($db_lang=='JAVA') $glwssa='.java';
+		if($db_lang=='JAVASCRIPT') $glwssa='.js';
+		if($db_lang=='HASKELL') $glwssa='.hs';
+		if($db_lang=='PERL') $glwssa='.pl';
+		if($db_lang=='PHP') $glwssa='.php';
+		if($db_lang=='PYTHON') $glwssa='.py';
+		if($db_lang=='RUBY') $glwssa='.rb';
+	}
+	else $glwssa='.txt';//dummy file extension in case call with empty extension happens
 	/*file creation code*/
 	$arxeio=$fpath.$db1.$glwssa;//file path creation code
 	if(isset($_POST['tmce_content']))
@@ -484,7 +489,7 @@ function submit_work($id, $on_behalf_of = null) {
     $nav[] = $works_url;
     $nav[] = array('url' => "$_SERVER[SCRIPT_NAME]?id=$id", 'name' => $title);
     if ($submit_ok) {
-	save_file();
+	save_file($lang);
         if ($group_sub) {
             $group_id = isset($_POST['group_id']) ? intval($_POST['group_id']) : -1;
             $gids = user_group_info($on_behalf_of ? null : $user_id, $course_id);
