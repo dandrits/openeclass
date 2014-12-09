@@ -312,14 +312,13 @@ draw($tool_content, 2, null, $head_content);
 //-------------------------------------
 // end of main program
 //-------------------------------------
-function save_file($db_lang,$secret_dir){
+function save_file($db_lang,$secret_dir,$id){
 	if(isset($_GET['course'])) $ccode=$_GET['course'];
 	/*create file path*/
 	$fpath="courses/" . $ccode . "/work/".$secret_dir."/";
 	/*end of file path*/
 	/*file name*/
-	
-	$db1='xxx';
+	$fname = substr(uniqid('', true), -$id);//random name generator based on assignment id
 	/*end of file name*/
 	/*katalixi arxeiou*/
 	if(!empty($db_lang))
@@ -339,7 +338,7 @@ function save_file($db_lang,$secret_dir){
 	}
 	else $glwssa='.txt';//dummy file extension in case call with empty extension happens
 	/*file creation code*/
-	$arxeio=$fpath.$db1.$glwssa;//file path creation code
+	$arxeio=$fpath.$fname.$glwssa;//file path creation code->path inside course+random name+file extension
 	if(isset($_POST['tmce_content']))
 	{
 		$f=fopen($arxeio,"w");
@@ -491,8 +490,8 @@ function submit_work($id, $on_behalf_of = null) {
     $nav[] = array('url' => "$_SERVER[SCRIPT_NAME]?id=$id", 'name' => $title);
     if ($submit_ok) {
 	$r = Database::get()->querySingle("SELECT secret_directory FROM assignment WHERE course_id = ?d AND id = ?d", $course_id, $id);
-	$dir = $r->secret_directory;
-	save_file($lang,$dir);
+	$sdir = $r->secret_directory;
+	save_file($lang,$sdir,$id);
         if ($group_sub) {
             $group_id = isset($_POST['group_id']) ? intval($_POST['group_id']) : -1;
             $gids = user_group_info($on_behalf_of ? null : $user_id, $course_id);
@@ -1342,7 +1341,7 @@ function show_student_assignment($id) {
 
 function show_submission_form($id, $user_group_info, $on_behalf_of = false) {
     global $tool_content, $m, $langWorkFile, $langSendFile, $langSubmit, $uid, $langNotice3, $gid, $is_member,
-    $urlAppend, $langGroupSpaceLink, $langOnBehalfOf, $course_code, $langWorkSyntax, $langWork,$epilogi,$tmce_content;
+    $urlAppend, $langGroupSpaceLink, $langOnBehalfOf, $course_code, $langWorkSyntax, $langWork;
 
     $group_select_hidden_input = $group_select_form = '';
     $is_group_assignment = is_group_assignment($id);
