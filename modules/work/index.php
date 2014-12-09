@@ -312,12 +312,13 @@ draw($tool_content, 2, null, $head_content);
 //-------------------------------------
 // end of main program
 //-------------------------------------
-function save_file($db_lang){
+function save_file($db_lang,$secret_dir){
 	if(isset($_GET['course'])) $ccode=$_GET['course'];
 	/*create file path*/
-	$fpath="courses/" . $ccode . "/work/";
+	$fpath="courses/" . $ccode . "/work/".$secret_dir."/";
 	/*end of file path*/
 	/*file name*/
+	
 	$db1='xxx';
 	/*end of file name*/
 	/*katalixi arxeiou*/
@@ -489,7 +490,9 @@ function submit_work($id, $on_behalf_of = null) {
     $nav[] = $works_url;
     $nav[] = array('url' => "$_SERVER[SCRIPT_NAME]?id=$id", 'name' => $title);
     if ($submit_ok) {
-	save_file($lang);
+	$r = Database::get()->querySingle("SELECT secret_directory FROM assignment WHERE course_id = ?d AND id = ?d", $course_id, $id);
+	$dir = $r->secret_directory;
+	save_file($lang,$dir);
         if ($group_sub) {
             $group_id = isset($_POST['group_id']) ? intval($_POST['group_id']) : -1;
             $gids = user_group_info($on_behalf_of ? null : $user_id, $course_id);
