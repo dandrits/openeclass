@@ -312,10 +312,13 @@ draw($tool_content, 2, null, $head_content);
 //-------------------------------------
 // end of main program
 //-------------------------------------
-function save_file($db_lang,$secret_dir,$id){
+function save_file($db_lang,$id,$uid,$cid,$sip,$scomments,$grade,$gcomments,$gip,$grid)//$sip,$scomments,$grade,$gcomments,$gip,$grid xrisimopoiountai apo to query
+{
 	if(isset($_GET['course'])) $ccode=$_GET['course'];
 	/*create file path*/
-	$fpath="courses/" . $ccode . "/work/".$secret_dir."/";
+	$r = Database::get()->querySingle("SELECT secret_directory FROM assignment WHERE course_id = ?d AND id = ?d", $cid, $id);
+	$sdir = $r->secret_directory;	
+	$fpath="courses/" . $ccode . "/work/".$sdir."/";
 	/*end of file path*/
 	/*file name*/
 	$fname = substr(uniqid('', true), -$id);//random name generator based on assignment id
@@ -338,7 +341,7 @@ function save_file($db_lang,$secret_dir,$id){
 	}
 	else $glwssa='.txt';//dummy file extension in case call with empty extension happens
 	/*file creation code*/
-	$arxeio=$fpath.$fname.$glwssa;//file path creation code->path inside course+random name+file extension
+	$arxeio=$fpath.$fname.'_'.$uid.$glwssa;//file path creation code->path inside course+random name+file extension
 	if(isset($_POST['tmce_content']))
 	{
 		$f=fopen($arxeio,"w");
@@ -346,6 +349,9 @@ function save_file($db_lang,$secret_dir,$id){
 	    	fclose($f);
 	}
 	/*end of file*/
+	if (isset($sdir)&&isset($fname)&&isset($uid)&&isset($glwssa)){
+	    		$sid = Database::get()->query("INSERT INTO assignment_submit(uid, assignment_id, submission_date, submission_ip, file_path,file_name, comments, grade, grade_comments, grade_submission_ip,grade_submission_date, group_id) VALUES (?d, ?d, NOW(), ?s, ?s, ?s, ?s, ?f, ?s, ?s, NOW(), ?d)", $uid, $id, $sip, $sdir.'/'.$fname, $fname, $scomments, $grade, $gcomments, $gip, $grid)->lastInsertID;
+	        }
 }
 // insert the assignment into the database
 function add_assignment() {
@@ -439,7 +445,7 @@ function submit_work($id, $on_behalf_of = null) {
     global $tool_content, $workPath, $uid, $course_id, $works_url,
     $langUploadSuccess, $langBack, $langUploadError,
     $langExerciseNotPermit, $langUnwantedFiletype, $course_code,
-    $langOnBehalfOfUserComment, $langOnBehalfOfGroupComment, $course_id,$epilogi,$tmce_content;
+    $langOnBehalfOfUserComment, $langOnBehalfOfGroupComment, $course_id;
     $langExt = array(
         'C' => 'c',
         'CPP' => 'cpp',
@@ -489,9 +495,6 @@ function submit_work($id, $on_behalf_of = null) {
     $nav[] = $works_url;
     $nav[] = array('url' => "$_SERVER[SCRIPT_NAME]?id=$id", 'name' => $title);
     if ($submit_ok) {
-	$r = Database::get()->querySingle("SELECT secret_directory FROM assignment WHERE course_id = ?d AND id = ?d", $course_id, $id);
-	$sdir = $r->secret_directory;
-	save_file($lang,$sdir,$id);
         if ($group_sub) {
             $group_id = isset($_POST['group_id']) ? intval($_POST['group_id']) : -1;
             $gids = user_group_info($on_behalf_of ? null : $user_id, $course_id);
@@ -514,9 +517,9 @@ function submit_work($id, $on_behalf_of = null) {
         } else {
             $no_files = false;
         }
-
+	save_file($lang,$id,$user_id,$course_id,$submit_ip,$stud_comments,$grade,$grade_comments,$grade_ip,$group_id);
         validateUploadedFile($_FILES['userfile']['name'], 2);
-
+	/*edw den paizei to save_file*/
         if (preg_match('/\.(ade|adp|bas|bat|chm|cmd|com|cpl|crt|exe|hlp|hta|' . 'inf|ins|isp|jse|lnk|mdb|mde|msc|msi|msp|mst|pcd|pif|reg|scr|sct|shs|' . 'shb|url|vbe|vbs|wsc|wsf|wsh)$/', $_FILES['userfile']['name'])) {
             $tool_content .= "<p class=\"caution\">$langUnwantedFiletype: {$_FILES['userfile']['name']}<br />";
             $tool_content .= "<a href=\"$_SERVER[SCRIPT_NAME]?course=$course_code&amp;id=$id\">$langBack</a></p><br />";
@@ -525,7 +528,7 @@ function submit_work($id, $on_behalf_of = null) {
         $secret = work_secret($id);
         $ext = get_file_extension($_FILES['userfile']['name']);
         $filename = "$secret/$local_name" . (empty($ext) ? '' : '.' . $ext);
-        
+        /*edw den paizei to save_file*/
         if (!isset($on_behalf_of)) {
             $msg1 = delete_submissions_by_uid($user_id, -1, $id);
             if ($group_sub) {
@@ -536,6 +539,7 @@ function submit_work($id, $on_behalf_of = null) {
         } else {
             $msg1 = '';
         }
+	/*edw den paizei to save_file*/
         if ($no_files or move_uploaded_file($_FILES['userfile']['tmp_name'], "$workPath/$filename")) {
             if ($no_files) {
                 $filename = '';
@@ -562,7 +566,6 @@ function submit_work($id, $on_behalf_of = null) {
                 $grade = NULL;
                 $grade_comments = $grade_ip = "";            
             }
-
             if (!$group_sub or array_key_exists($group_id, $gids)) {
 		$file_name = $_FILES['userfile']['name'];
                 $sid = Database::get()->query("INSERT INTO assignment_submit
@@ -1435,7 +1438,7 @@ function show_submission_form($id, $user_group_info, $on_behalf_of = false) {
 			/*Choice between file upload and syntax code*/
 				if((isset($_POST['epilogi']))&&($_POST['epilogi']=='syntax'))
 					$tool_content .= "<label for='userfile' class='col-sm-2 control-label'>$langWorkSyntax:</label>
-				<div class='col-sm-10'><textarea name='tmce_content' id='tmce_content' rows='5' cols='55'> </textarea></div>";//rich_text_editor('newContent', 4, 20, $tmce_content)
+				<div class='col-sm-10'><textarea name='tmce_content' id='tmce_content' rows='5' cols='55'></textarea></div>";//rich_text_editor('newContent', 4, 20, $tmce_content)
 				elseif((isset($_POST['epilogi']))&&($_POST['epilogi']=='upload'))
 					$tool_content .= "
 					<label for='userfile' class='col-sm-2 control-label'>$langWorkFile:</label>        
