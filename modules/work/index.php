@@ -296,21 +296,6 @@ if ($is_editor) {
             $nameTools = $m['SubmissionStatusWorkInfo'];
             $navigation[] = $works_url;
             $navigation[] = array('url' => "$_SERVER[SCRIPT_NAME]?course=$course_code&amp;id=$id", 'name' => $langWorks);
-	    /*file path*/
-	    $fpath="courses/" . $course_code . "/work";
-	    /*end of file path*/
-	    //$db = Database::get()->queryArray("SELECT cource_id,lang FROM `assignment` WHERE course_id = ?d", $course_id);
-	    /*katalixi arxeiou*/
-	    $glwssa="php";
-	    /*file creation code*/
-	    $arxeio=$fpath."/xxx.".$glwssa;
-	    if(isset($_POST['tmce_content']))
-	    {
-	    	$f=fopen($arxeio,"w");
-	    	fwrite($f,$_REQUEST['id']);//$_POST['tmce_content']
-	    	fclose($f);
-	     }
-	    /*end of file*/
             submit_work($id);
         } else {
             $work_title = Database::get()->querySingle("SELECT title FROM assignment WHERE id = ?d", $id)->title;
@@ -327,6 +312,36 @@ draw($tool_content, 2, null, $head_content);
 //-------------------------------------
 // end of main program
 //-------------------------------------
+function save_file(){
+	if(isset($_GET['course'])) $ccode=$_GET['course'];
+	/*create file path*/
+	$fpath="courses/" . $ccode . "/work/";
+	/*end of file path*/
+	/*katalixi arxeiou*/
+	$db_lang='PERL';
+	$db1='xxx';
+	if($db_lang=='C') $glwssa='.c';
+	if($db_lang=='CPP') $glwssa='.cpp';
+	if($db_lang=='CPP11') $glwssa='.c11';
+	if($db_lang=='CLOJURE') $glwssa='.clj';
+	if($db_lang=='CSHARP') $glwssa='.cs';
+	if($db_lang=='JAVA') $glwssa='.java';
+	if($db_lang=='JAVASCRIPT') $glwssa='.js';
+	if($db_lang=='HASKELL') $glwssa='.hs';
+	if($db_lang=='PERL') $glwssa='.pl';
+	if($db_lang=='PHP') $glwssa='.php';
+	if($db_lang=='PYTHON') $glwssa='.py';
+	if($db_lang=='RUBY') $glwssa='.rb';
+	/*file creation code*/
+	$arxeio=$fpath.$db1.$glwssa;//file path creation code
+	if(isset($_POST['tmce_content']))
+	{
+		$f=fopen($arxeio,"w");
+	  	fwrite($f,$_POST['tmce_content']);
+	    	fclose($f);
+	}
+	/*end of file*/
+}
 // insert the assignment into the database
 function add_assignment() {
     global $tool_content, $workPath, $course_id, $uid, $langTheField, $m, 
@@ -469,6 +484,7 @@ function submit_work($id, $on_behalf_of = null) {
     $nav[] = $works_url;
     $nav[] = array('url' => "$_SERVER[SCRIPT_NAME]?id=$id", 'name' => $title);
     if ($submit_ok) {
+	save_file();
         if ($group_sub) {
             $group_id = isset($_POST['group_id']) ? intval($_POST['group_id']) : -1;
             $gids = user_group_info($on_behalf_of ? null : $user_id, $course_id);
@@ -2296,4 +2312,3 @@ function groups_with_no_submissions($id) {
     }
     return $groups;
 }
-
