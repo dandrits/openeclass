@@ -312,7 +312,7 @@ draw($tool_content, 2, null, $head_content);
 //-------------------------------------
 // end of main program
 //-------------------------------------
-function save_file($db_lang,$id,$uid,$cid)//$sip,$scomments,$grade,$gcomments,$gip,$grid xrisimopoiountai apo to query
+function save_file($db_lang,$id,$uid,$cid)
 {
 	if(isset($_GET['course'])) $ccode=$_GET['course'];
 	/*create file path*/
@@ -320,9 +320,11 @@ function save_file($db_lang,$id,$uid,$cid)//$sip,$scomments,$grade,$gcomments,$g
 	$sdir = $r->secret_directory;	
 	$fpath="courses/" . $ccode . "/work/".$sdir."/";
 	/*end of file path*/
+
 	/*file name*/
-	$fname = substr(uniqid('', true), -5);//random name generator based on assignment id
+	$fname = substr(uniqid('', true), -5);//random name generator
 	/*end of file name*/
+
 	/*katalixi arxeiou*/
 	if(!empty($db_lang))
 	{
@@ -348,7 +350,8 @@ function save_file($db_lang,$id,$uid,$cid)//$sip,$scomments,$grade,$gcomments,$g
 	  	fwrite($f,$_POST['tmce_content']);
 	    	fclose($f);
 	}
-	/*end of file*/
+	/*end of file creation*/
+
 	if (isset($on_behalf_of)) {
                 if ($group_sub) {
                     $auto_comments = sprintf($langOnBehalfOfGroupComment, uid_to_name($uid), $gids[$group_id]);
@@ -370,9 +373,11 @@ function save_file($db_lang,$id,$uid,$cid)//$sip,$scomments,$grade,$gcomments,$g
             }
         if (!$group_sub or array_key_exists($group_id, $gids)) {
 		if (isset($sdir)&&isset($fname)&&isset($uid)&&isset($glwssa)){
-	    		$sid = Database::get()->query("INSERT INTO assignment_submit(uid, assignment_id, submission_date, submission_ip, file_path,file_name, comments, grade, grade_comments, grade_submission_ip,grade_submission_date, group_id) VALUES (?d, ?d, NOW(), ?s, ?s, ?s, ?s, ?f, ?s, ?s, NOW(), ?d)", $uid, $id, $_SERVER['REMOTE_ADDR'], $sdir.'/'.$fname.$glwssa, $fname, $stud_comments, $grade, $grade_comments,$grade_ip, $group_id)->lastInsertID;
+	    		$sid = Database::get()->query("INSERT INTO assignment_submit(uid, assignment_id, submission_date, submission_ip, file_path,file_name, comments, grade, grade_comments, grade_submission_ip,grade_submission_date, group_id) VALUES (?d, ?d, NOW(), ?s, ?s, ?s, ?s, ?f, ?s, ?s, NOW(), ?d)", $uid, $id, $_SERVER['REMOTE_ADDR'], $sdir.'/'.$fname.'_'.$uid.$glwssa, $fname.'_'.$uid.$glwssa, $stud_comments, $grade, $grade_comments,$grade_ip, $group_id)->lastInsertID;
 	        }
 	}
+	
+	return $_POST['tmce_content'];
 }
 // insert the assignment into the database
 function add_assignment() {
@@ -538,8 +543,14 @@ function submit_work($id, $on_behalf_of = null) {
         } else {
             $no_files = false;
         }
-	save_file($lang,$id,$user_id,$course_id,$stud_comments,$grade,$grade_comments,$grade_ip,$group_id);
-        validateUploadedFile($_FILES['userfile']['name'], 2);
+	//paizei mono edw!!!!!!!!!!!
+	$periexomeno=save_file($lang,$id,$user_id,$course_id);	
+	
+			
+
+	validateUploadedFile($_FILES['userfile']['name'], 2);
+
+	
 	/*edw den paizei to save_file*/
         if (preg_match('/\.(ade|adp|bas|bat|chm|cmd|com|cpl|crt|exe|hlp|hta|' . 'inf|ins|isp|jse|lnk|mdb|mde|msc|msi|msp|mst|pcd|pif|reg|scr|sct|shs|' . 'shb|url|vbe|vbs|wsc|wsf|wsh)$/', $_FILES['userfile']['name'])) {
             $tool_content .= "<p class=\"caution\">$langUnwantedFiletype: {$_FILES['userfile']['name']}<br />";
@@ -593,7 +604,7 @@ function submit_work($id, $on_behalf_of = null) {
                                         (uid, assignment_id, submission_date, submission_ip, file_path,
                                          file_name, comments, grade, grade_comments, grade_submission_ip,
                                          grade_submission_date, group_id)
-                                         VALUES (?d, ?d, NOW(), ?s, ?s, ?s, ?s, ?f, ?s, ?s, NOW(), ?d)", $user_id, $id, $submit_ip, $filename, $file_name, $stud_comments, $grade, $grade_comments, $grade_ip, $group_id)->lastInsertID;//$stud_comments,$grade,$grade_comments,$grade_ip,$group_id
+                                         VALUES (?d, ?d, NOW(), ?s, ?s, ?s, ?s, ?f, ?s, ?s, NOW(), ?d)", $user_id, $id, $submit_ip, $filename, $file_name, $stud_comments, $grade, $grade_comments, $grade_ip, $group_id)->lastInsertID;
                 Log::record($course_id, MODULE_ID_ASSIGN, LOG_INSERT, array('id' => $sid,
                     'title' => $title,
                     'assignment_id' => $id,
@@ -610,8 +621,8 @@ function submit_work($id, $on_behalf_of = null) {
             $tool_content .= "<div class='alert alert-success'>$msg2<br>$msg1<br><a href='$_SERVER[SCRIPT_NAME]?course=$course_code&amp;id=$id'>$langBack</a></div><br>";
         } else {
             $tool_content .= "<div class='alert alert-danger'>$langUploadError<br><a href='$_SERVER[SCRIPT_NAME]?course=$course_code'>$langBack</a></div><br>";
-        }
-        
+        }	
+
         // Auto-judge: Send file to hackearth
         if ($auto_judge && $ext === $langExt[$lang]) {
                 global $hackerEarthKey;
@@ -652,6 +663,9 @@ function submit_work($id, $on_behalf_of = null) {
                 $grade = round($passed/count($auto_judge_scenarios)*10);
                 // Add the output as a comment
                 submit_grade_comments($id, $sid, $grade, 'Passed: '.$passed.'/'.count($auto_judge_scenarios), false, $auto_judge_scenarios_output, true);
+		/*$fileSyntax=fopen("test.txt","w");
+		fwrite($fileSyntax,$curScenario['input']);
+		fclose($fileSyntax);*/
         }
         // End Auto-judge
     } else { // not submit_ok
