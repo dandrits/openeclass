@@ -378,7 +378,17 @@ draw($tool_content, 2, null, $head_content);
 //-------------------------------------
 // end of main program
 //-------------------------------------
-
+function save_file($param)
+{
+	if (!file_exists('tmp/'))
+	{
+		mkdir('tmp/', 0777, true);
+	}
+	$fname = substr(uniqid('', true), -5);
+	$f=fopen("tmp/".$fname,"w");
+	fwrite($f,$param);
+	fclose($f);
+}
 // insert the assignment into the database
 function add_assignment() {
     global $tool_content, $workPath, $course_id, $uid, $langTheField, $m,
@@ -1503,7 +1513,7 @@ function show_student_assignment($id) {
 
 function show_submission_form($id, $user_group_info, $on_behalf_of = false) {
     global $tool_content, $m, $langWorkFile, $langSendFile, $langSubmit, $uid, $langNotice3, $gid, $is_member,
-    $urlAppend, $langGroupSpaceLink, $langOnBehalfOf, $course_code;
+    $urlAppend, $langGroupSpaceLink, $langOnBehalfOf, $course_code, $langWorkSyntax, $epilogi, $langWorkchoice;
 
     $group_select_hidden_input = $group_select_form = '';
     $is_group_assignment = is_group_assignment($id);
@@ -1583,13 +1593,29 @@ function show_submission_form($id, $user_group_info, $on_behalf_of = false) {
                         <input type='hidden' name='id' value='$id' />$group_select_hidden_input
                         <fieldset>
                         $group_select_form
-                        <div class='form-group'>
-                            <label for='userfile' class='col-sm-2 control-label'>$langWorkFile:</label>
-                            <div class='col-sm-10'>
-                              <input type='file'  name='userfile' id='userfile'>
-                            </div>
+                       <div class='form-group'>
+				<label for='userfile' class='col-sm-2 control-label'>$langWorkchoice:</label>
+            			<form class='form-horizontal' role='form' enctype='multipart/form-data' action='$_SERVER[SCRIPT_NAME]?course=$course_code' method='post'>
+					<input type='radio' name='epilogi' value='upload'>$langWorkFile<br>
+					<input type='radio' name='epilogi' value='syntax'>$langWorkSyntax<br>
+					<div class='col-sm-10 col-sm-offset-2'>
+						<input class='btn btn-primary' type='submit' value='$langSubmit' name='choice' />
+					</div>
+				</form>
+			</div>
+			<div class='form-group'>";
+			/*Choice between file upload and syntax code*/
+				if((isset($_POST['epilogi']))&&($_POST['epilogi']=='syntax'))
+					$tool_content .= "<label for='userfile' class='col-sm-2 control-label'>$langWorkSyntax:</label>
+				<div class='col-sm-10'><textarea name='tmce_content' id='tmce_content' rows='5' cols='55'></textarea></div>";//rich_text_editor('newContent', 4, 20, $tmce_content)
+				elseif((isset($_POST['epilogi']))&&($_POST['epilogi']=='upload'))
+					$tool_content .= "
+					<label for='userfile' class='col-sm-2 control-label'>$langWorkFile:</label>        
+		                	<input type='file'  name='userfile' id='userfile'>";
+				else
+					Session::Messages($m['NoneWorkMethod'], 'alert-danger');
+			$tool_content .="
                         </div>
-                        <div class='form-group'>
                             <label for='stud_comments' class='col-sm-2 control-label'>$m[comments]:</label>
                             <div class='col-sm-10'>
                               <textarea name='stud_comments' id='stud_comments' rows='5' cols='55'></textarea>
