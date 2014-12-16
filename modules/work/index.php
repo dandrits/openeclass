@@ -1616,6 +1616,7 @@ function show_submission_form($id, $user_group_info, $on_behalf_of = false) {
 					Session::Messages($m['NoneWorkMethod'], 'alert-danger');
 			$tool_content .="
                         </div>
+			<div class='form-group'>
                             <label for='stud_comments' class='col-sm-2 control-label'>$m[comments]:</label>
                             <div class='col-sm-10'>
                               <textarea name='stud_comments' id='stud_comments' rows='5' cols='55'></textarea>
