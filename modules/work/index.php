@@ -23,7 +23,6 @@
   @Description: Main script for the work tool
   ============================================================================
  */
-
 $require_current_course = true;
 $require_login = true;
 $require_help = true;
@@ -363,7 +362,7 @@ if ($is_editor) {
             $nameTools = $m['SubmissionStatusWorkInfo'];
             $navigation[] = $works_url;
             $navigation[] = array('url' => "$_SERVER[SCRIPT_NAME]?course=$course_code&amp;id=$id", 'name' => $langWorks);
-            submit_work($id);
+	    submit_work($id);
         } else {
             $work_title = Database::get()->querySingle("SELECT title FROM assignment WHERE id = ?d", $id)->title;
             $nameTools = $work_title;
@@ -537,7 +536,7 @@ function submit_work($id, $on_behalf_of = null) {
     $max_grade = $row->max_grade;
     $nav[] = $works_url;
     $nav[] = array('url' => "$_SERVER[SCRIPT_NAME]?id=$id", 'name' => $title);
-
+    
     if ($submit_ok) {
         if ($group_sub) {
             $group_id = isset($_POST['group_id']) ? intval($_POST['group_id']) : -1;
@@ -1475,7 +1474,7 @@ function show_student_assignment($id) {
 
 function show_submission_form($id, $user_group_info, $on_behalf_of = false) {
     global $tool_content, $m, $langWorkFile, $langSendFile, $langSubmit, $uid, $langNotice3, $gid, $is_member,
-    $urlAppend, $langGroupSpaceLink, $langOnBehalfOf, $course_code, $langWorkSyntax, $epilogi, $langWorkchoice;
+    $urlAppend, $langGroupSpaceLink, $langOnBehalfOf, $course_code, $langWorkSyntax, $langWorkchoice;
 
     $group_select_hidden_input = $group_select_form = '';
     $is_group_assignment = is_group_assignment($id);
@@ -1567,13 +1566,17 @@ function show_submission_form($id, $user_group_info, $on_behalf_of = false) {
 			</div>
 			<div class='form-group'>";
 			/*Choice between file upload and syntax code*/
-				if((isset($_POST['epilogi']))&&($_POST['epilogi']=='syntax'))
+				if((isset($_POST['epilogi']))&&($_POST['epilogi']=='syntax')){
 					$tool_content .= "<label for='userfile' class='col-sm-2 control-label'>$langWorkSyntax:</label>
-				<div class='col-sm-10'><textarea name='tmce_content' id='tmce_content' rows='5' cols='55'></textarea></div>";//rich_text_editor('newContent', 4, 20, $tmce_content)
-				elseif((isset($_POST['epilogi']))&&($_POST['epilogi']=='upload'))
+				<div class='col-sm-10'><textarea name='tmce_content' id='tmce_content' rows='5' cols='55'></textarea></div>";
+					$_SESSION['epilogi']=$_POST['epilogi'];
+				}
+				elseif((isset($_POST['epilogi']))&&($_POST['epilogi']=='upload')){
 					$tool_content .= "
 					<label for='userfile' class='col-sm-2 control-label'>$langWorkFile:</label>        
 		                	<input type='file'  name='userfile' id='userfile'>";
+					$_SESSION['epilogi']=$_POST['epilogi'];
+				}
 				else
 					Session::Messages($m['NoneWorkMethod'], 'alert-danger');
 			$tool_content .="
