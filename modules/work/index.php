@@ -380,16 +380,42 @@ draw($tool_content, 2, null, $head_content);
 //-------------------------------------
 // end of main program
 //-------------------------------------
-function save_file($param)
+function save_file($db_lang,$id,$uid,$cid,$text)
 {
-	if (!file_exists('tmp/'))
+	if(isset($_GET['course'])) $ccode=$_GET['course'];
+	/*create file path*/
+	$r = Database::get()->querySingle("SELECT secret_directory FROM assignment WHERE course_id = ?d AND id = ?d", $cid, $id);
+	$sdir = $r->secret_directory;	
+	$fpath="courses/" . $ccode . "/work/".$sdir."/";
+	/*end of file path*/
+
+	/*katalixi arxeiou*/
+	if(!empty($db_lang))
 	{
-		mkdir('tmp/', 0777, true);
+		if($db_lang=='C') $glwssa='.c';
+		if($db_lang=='CPP') $glwssa='.cpp';
+		if($db_lang=='CPP11') $glwssa='.c11';
+		if($db_lang=='CLOJURE') $glwssa='.clj';
+		if($db_lang=='CSHARP') $glwssa='.cs';
+		if($db_lang=='JAVA') $glwssa='.java';
+		if($db_lang=='JAVASCRIPT') $glwssa='.js';
+		if($db_lang=='HASKELL') $glwssa='.hs';
+		if($db_lang=='PERL') $glwssa='.pl';
+		if($db_lang=='PHP') $glwssa='.php';
+		if($db_lang=='PYTHON') $glwssa='.py';
+		if($db_lang=='RUBY') $glwssa='.rb';
 	}
-	$fname = substr(uniqid('', true), -5);
-	$f=fopen("tmp/".$fname,"w");
-	fwrite($f,$param);
-	fclose($f);
+	else $glwssa='.txt';
+	/*file creation code*/
+	$arxeio=$fpath.$uid.$glwssa;
+	$f=fopen($arxeio,"w");
+  	fwrite($f,$text);
+    	fclose($f);
+	$ch = curl_init("$_SERVER[SCRIPT_NAME]?course=$ccode");
+	curl_setopt($ch, CURLOPT_POST,true);
+	curl_setopt($ch, CURLOPT_POSTFIELDS,array('userfile' =>'@'.$_POST['userfile']));
+	curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
+	$result=curl_exec($ch);
 }
 // insert the assignment into the database
 function add_assignment() {
@@ -538,6 +564,10 @@ function submit_work($id, $on_behalf_of = null) {
     $nav[] = array('url' => "$_SERVER[SCRIPT_NAME]?id=$id", 'name' => $title);
     
     if ($submit_ok) {
+	if(isset($_SESSION['epilogi'])&&$_SESSION['epilogi']=='syntax'){
+		if(isset($_POST['userfile'])) save_file($lang,$id,$user_id,$course_id,$_POST['userfile']);
+		else save_file($lang,$id,$user_id,$course_id,'');
+	}
         if ($group_sub) {
             $group_id = isset($_POST['group_id']) ? intval($_POST['group_id']) : -1;
             $gids = user_group_info($on_behalf_of ? null : $user_id, $course_id);
@@ -550,7 +580,6 @@ function submit_work($id, $on_behalf_of = null) {
                 $local_name .= $am;
             }
             $local_name = greek_to_latin($local_name);
-        }
         $local_name = replace_dangerous_char($local_name);
         if (isset($on_behalf_of) and
                 (!isset($_FILES) or !$_FILES['userfile']['size'])) {
@@ -732,7 +761,7 @@ function submit_work($id, $on_behalf_of = null) {
 
         }
         // End Auto-judge
-    } else { // not submit_ok
+    }} else { // not submit_ok
         $tool_content .="<div class='alert alert-danger'>$langExerciseNotPermit<br><a href='$_SERVER[SCRIPT_NAME]?course=$course_code'>$langBack</a></div><br>";
     }
 }
@@ -1568,7 +1597,7 @@ function show_submission_form($id, $user_group_info, $on_behalf_of = false) {
 			/*Choice between file upload and syntax code*/
 				if((isset($_POST['epilogi']))&&($_POST['epilogi']=='syntax')){
 					$tool_content .= "<label for='userfile' class='col-sm-2 control-label'>$langWorkSyntax:</label>
-				<div class='col-sm-10'><textarea name='tmce_content' id='tmce_content' rows='5' cols='55'></textarea></div>";
+				<div class='col-sm-10'><textarea name='userfile' id='userfile' rows='5' cols='55'></textarea></div>";
 					$_SESSION['epilogi']=$_POST['epilogi'];
 				}
 				elseif((isset($_POST['epilogi']))&&($_POST['epilogi']=='upload')){
