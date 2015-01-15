@@ -52,7 +52,7 @@ if (isset($_GET['assignment'])) {
     $i = 1;
     $i++;
 
-	$nameTools = 'Κατατάξεις εργασίας ['. $assign->title. ']';
+	$nameTools = sprintf($langAutoJudgeRankReport, $assign->title);
 
     
     if($assign==null)
@@ -97,18 +97,19 @@ function get_course_title() {
 }
 
 function show_report($assign,$submissions) {
-		global $tool_content,$course_code;
+		global $m, $tool_content,$course_code, $langAutoJudgeRank, $langAutoJudgeStudent,
+                $langAutoJudgeScenariosPassed, $langAutoJudgeDownloadPdf;
            $tool_content = "
                                 <table  style=\"table-layout: fixed; width: 99%\" class='table-default'>
                                 <tr>
-                                     <td><b>Κατάταξη</b></td>
-                                     <td><b>Εκπαιδευόμενος</b></td>
-                                     <td><b>Βαθμός</b></td>
-                                     <td><b>Περασμένα Σενάρια</b></td>
+                                     <td><b>$langAutoJudgeRank</b></td>
+                                     <td><b>$langAutoJudgeStudent</b></td>
+                                     <td><b>".$m['grade']."</b></td>
+                                     <td><b>$langAutoJudgeScenariosPassed</b></td>
                                 </tr>". get_table_content($assign,$submissions) . "
                                 
                                 </table>
-                                 <p align='left'><a  class='btn btn-primary' href='rank_report.php?course=".$course_code."&assignment=".$assign->id."&downloadpdf=1'>Λήψη σε μορφή PDF</a></p>
+                                 <p align='left'><a  class='btn btn-primary' href='rank_report.php?course=".$course_code."&assignment=".$assign->id."&downloadpdf=1'>$langAutoJudgeDownloadPdf</a></p>
                                 <br>";
   }
 
@@ -116,20 +117,18 @@ function get_table_content($assign,$submissions) {
     global $themeimg;
     $table_content = "";
     $i=1;
-       
-       // Condition about rank position and color of medal
-
-if ($i==1 or $i == 2) {$i.=" <img src=\"http://".$_SERVER['HTTP_HOST'].$themeimg."/work_medals/Gold_medal_with_cup.png\" width='30px' height='30px'>";}                                        
-if ($i==3 or $i == 4) {$i.=" <img src=\"http://".$_SERVER['HTTP_HOST'].$themeimg."/work_medals/Silver_medal_with_cup.png\"  width='30px' height='30px'>";}     
-if ($i==5 or $i == 6) {$i.=" <img src=\"http://".$_SERVER['HTTP_HOST'].$themeimg."/work_medals/Bronze_medal_with_cup.png\" width='30px' height='30px'>";} 
 
  // End of Condition about rank position and color of medal    
     
     foreach($submissions as $submission){
-//                     $icon = ($auto_judge_scenarios_output[$i]['passed']==1) ? 'tick.png' : 'delete.png';
+                     $s = $i;
+                     // Condition about rank position and color of medal
+                     if ($i==1 or $i == 2) {$s.=" <img src=\"http://".$_SERVER['HTTP_HOST'].$themeimg."/work_medals/Gold_medal_with_cup.svg\" style=\"width: 30px; height: 30px\">";}
+                     if ($i==3 or $i == 4) {$s.=" <img src=\"http://".$_SERVER['HTTP_HOST'].$themeimg."/work_medals/Silver_medal_with_cup.svg\"  style=\"width: 30px; height: 30px\">";}
+                     if ($i==5 or $i == 6) {$s.=" <img src=\"http://".$_SERVER['HTTP_HOST'].$themeimg."/work_medals/Bronze_medal_with_cup.svg\" style=\"width: 30px; height: 30px\">";}
                      $table_content.="
                                       <tr>
-                                      <td style=\"word-break:break-all;\">".$i."</td>
+                                      <td style=\"word-break:break-all;\">".$s."</td>
                                       <td style=\"word-break:break-all;\">".$submission->username."</td>
                                       <td style=\"word-break:break-all;\">".$submission->grade."/". $assign->max_grade  ."</td>
                                       <td align=\"center\">".$submission->grade_comments."</td></tr>";
